@@ -5,4 +5,6 @@ lab:
     description: 'Hoping.'
 ---
 
+{% include_relative ../../remotes/01-analyze-images.md %}
+
 
