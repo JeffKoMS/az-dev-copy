@@ -29,19 +29,18 @@ jobs:
         run: |
           set -euo pipefail
 
-          mkdir -p remotes
+          mkdir -p _includes
 
-          CONFIG_TXT="remotes/sources.txt"
-          CONFIG_YML="remotes/sources.yml"
+          CONFIG_TXT="_includes/sources.txt"
+          CONFIG_YML="_includes/sources.yml"
 
           urls=()
 
           # Load from plain text file: one URL per non-empty, non-comment line
           if [[ -f "$CONFIG_TXT" ]]; then
             while IFS= read -r line; do
-              # trim leading/trailing whitespace
-              line="${line##+([[:space:]])}"
-              line="${line%%+([[:space:]])}"
+              # trim leading/trailing whitespace (portable)
+              line="$(sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//' <<< "$line")"
               [[ -z "$line" || "$line" =~ ^# ]] && continue
               urls+=("$line")
             done < "$CONFIG_TXT"
@@ -59,11 +58,11 @@ jobs:
           fi
 
           if [[ ${#urls[@]} -eq 0 ]]; then
-            echo "No sources found. Add URLs to remotes/sources.txt or a YAML list in remotes/sources.yml."
+            echo "No sources found. Add URLs to _includes/sources.txt or a YAML list in _includes/sources.yml."
             exit 1
           fi
 
-          echo "Found ${#urls[@]} source(s)." 
+          echo "Found ${#urls[@]} source(s)."
 
           download_and_process() {
             local url="$1"
@@ -82,7 +81,7 @@ jobs:
             fi
 
             tmp_file=$(mktemp)
-            out_file="remotes/${base_name}"
+            out_file="_includes/${base_name}"
 
             echo "Downloading: $url -> $out_file"
             curl -fsSL "$url" -o "$tmp_file"
@@ -104,12 +103,12 @@ jobs:
 
       - name: Commit and push if changes detected
         run: |
-          git add remotes
+          git add _includes
           if git diff --staged --quiet; then
             echo "No changes to commit."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "chore: sync remote Markdown from sources list"
+          git commit -m "chore: sync remote Markdown from sources list into _includes"
           git push origin main
