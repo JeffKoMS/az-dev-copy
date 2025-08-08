@@ -1,0 +1,115 @@
+name: Sync remote markdown
+
+on:
+  schedule:
+    # Daily at 06:00 UTC
+    - cron: '0 6 * * *'
+  # Allow manual runs
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-remote-markdown
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download remote markdown files from list and strip front matter
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p remotes
+
+          CONFIG_TXT="remotes/sources.txt"
+          CONFIG_YML="remotes/sources.yml"
+
+          urls=()
+
+          # Load from plain text file: one URL per non-empty, non-comment line
+          if [[ -f "$CONFIG_TXT" ]]; then
+            while IFS= read -r line; do
+              # trim leading/trailing whitespace
+              line="${line##+([[:space:]])}"
+              line="${line%%+([[:space:]])}"
+              [[ -z "$line" || "$line" =~ ^# ]] && continue
+              urls+=("$line")
+            done < "$CONFIG_TXT"
+          fi
+
+          # Load from YAML file: simple list with "- <url>" items; ignore comments/blank lines
+          if [[ -f "$CONFIG_YML" ]]; then
+            while IFS= read -r item; do
+              # Remove leading dash and whitespace, strip inline comments
+              item=$(sed -E 's/^\s*-\s*//' <<< "$item")
+              item=$(sed -E 's/\s+#.*$//' <<< "$item")
+              [[ -z "$item" ]] && continue
+              urls+=("$item")
+            done < <(grep -E '^[[:space:]]*-[[:space:]]*[^#[:space:]]' "$CONFIG_YML")
+          fi
+
+          if [[ ${#urls[@]} -eq 0 ]]; then
+            echo "No sources found. Add URLs to remotes/sources.txt or a YAML list in remotes/sources.yml."
+            exit 1
+          fi
+
+          echo "Found ${#urls[@]} source(s)." 
+
+          download_and_process() {
+            local url="$1"
+
+            # Convert GitHub UI blob URLs to raw URLs if needed
+            if [[ "$url" =~ ^https://github.com/([^/]+)/([^/]+)/blob/([^/]+)/(.*)$ ]]; then
+              url="https://raw.githubusercontent.com/${BASH_REMATCH[1]}/${BASH_REMATCH[2]}/${BASH_REMATCH[3]}/${BASH_REMATCH[4]}"
+              base_name="$(basename "${BASH_REMATCH[4]}")"
+            else
+              base_name="$(basename "$url")"
+            fi
+
+            # Ensure it ends with .md for saving
+            if [[ ! "$base_name" =~ \.md$ ]]; then
+              base_name="${base_name}.md"
+            fi
+
+            tmp_file=$(mktemp)
+            out_file="remotes/${base_name}"
+
+            echo "Downloading: $url -> $out_file"
+            curl -fsSL "$url" -o "$tmp_file"
+
+            # Strip a single YAML front-matter block only if it is at the very top of the file
+            awk '
+              NR==1 && $0 ~ /^---[[:space:]]*$/ { infront=1; next }
+              infront && $0 ~ /^---[[:space:]]*$/ { infront=0; next }
+              infront { next }
+              { print }
+            ' "$tmp_file" > "$out_file"
+
+            rm -f "$tmp_file"
+          }
+
+          for u in "${urls[@]}"; do
+            download_and_process "$u"
+          done
+
+      - name: Commit and push if changes detected
+        run: |
+          git add remotes
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: sync remote Markdown from sources list"
+          git push origin main
