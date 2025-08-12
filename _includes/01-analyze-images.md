@@ -164,7 +164,7 @@ In this exercise, you'll complete a partially implemented client application tha
 
 1. Run the program again, this time with the argument **images/building.jpg** to see the caption that gets generated for the **building.jpg** image, which looks like this:
 
-    ![A picture of a building.](https://github.com/MicrosoftLearning/mslearn-ai-vision/raw/main/Instructions/Labs/media/building.jpg)
+    ![A picture of a building.](https://github.com/MicrosoftLearning/mslearn-ai-vision/blob/main/Instructions/Labs/media/building.jpg?raw=1)
 
 1. Repeat the previous step to generate a caption for the **images/person.jpg** file, which looks like this:
 
