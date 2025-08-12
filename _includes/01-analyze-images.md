@@ -160,15 +160,15 @@ In this exercise, you'll complete a partially implemented client application tha
 
 1. Observe the output, which should include a suggested caption for the **street.jpg** image, which looks like this:
 
-    ![A picture of a busy street.](https://raw.githubusercontent.com/MicrosoftLearning/mslearn-ai-vision/main/Instructions/Labs/media/street.jpg)
+    ![A picture of a busy street.](../media/street.jpg)
 
 1. Run the program again, this time with the argument **images/building.jpg** to see the caption that gets generated for the **building.jpg** image, which looks like this:
 
-    ![A picture of a building.](https://github.com/MicrosoftLearning/mslearn-ai-vision/blob/main/Instructions/Labs/media/building.jpg?raw=1)
+    ![A picture of a building.](../media/building.jpg)
 
 1. Repeat the previous step to generate a caption for the **images/person.jpg** file, which looks like this:
 
-    ![A picture of a person.](https://github.com/MicrosoftLearning/mslearn-ai-vision/blob/main/Instructions/Labs/media/person.jpg)
+    ![A picture of a person.](../media/person.jpg)
 
 ### Add code to generate suggested tags
 
@@ -211,7 +211,7 @@ It can sometimes be useful to identify relevant *tags* that provide clues about 
 
     The download command creates a popup link at the bottom right of your browser, which you can select to download and open the file. The image should look similar to this:
 
-    ![An image with object boundary boxes.](https://github.com/MicrosoftLearning/mslearn-ai-vision/blob/main/Instructions/Labs/media/objects.jpg)
+    ![An image with object boundary boxes.](../media/objects.jpg)
 
 1. Rerun the program for the **images/building.jpg** and **images/person.jpg** files, downloading the generated objects.jpg file after each run.
 
@@ -242,7 +242,7 @@ It can sometimes be useful to identify relevant *tags* that provide clues about 
 
     The download command creates a popup link at the bottom right of your browser, which you can select to download and open the file. The image should look similar to this:
 
-    ![An image with boundary boxes for detected people.](https://github.com/MicrosoftLearning/mslearn-ai-vision/blob/main/Instructions/Labs/media/people.jpg)
+    ![An image with boundary boxes for detected people.](../media/people.jpg)
 
 1. Rerun the program for the **images/building.jpg** and **images/person.jpg** files, downloading the generated people.jpg file after each run.
 
