@@ -242,7 +242,7 @@ It can sometimes be useful to identify relevant *tags* that provide clues about 
 
     The download command creates a popup link at the bottom right of your browser, which you can select to download and open the file. The image should look similar to this:
 
-    ![An image with boundary boxes for detected people.](https://raw.githubusercontent.com/MicrosoftLearning/mslearn-ai-vision/refs/heads/main/Instructions/media/people.jpg)
+    ![An image with boundary boxes for detected people.](../media/people.jpg)
 
 1. Rerun the program for the **images/building.jpg** and **images/person.jpg** files, downloading the generated people.jpg file after each run.
 
