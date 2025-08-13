@@ -7,8 +7,10 @@ lab:
 
 <!-- This labs is maintained in the https://github.com/MicrosoftLearning/mslearn-ai-vision repository. Please file issues in that repository. -->
 
-> [!NOTE]
-> Useful information that users should know, even when skimming content.
+1. This is some text.
+
+    > [!NOTE]
+    > Useful information that users should know, even when skimming content.
 
 > [!TIP]
 > Helpful advice for doing things better or more easily.
