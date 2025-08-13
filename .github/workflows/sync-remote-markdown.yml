@@ -32,7 +32,6 @@ jobs:
           mkdir -p _includes
 
           CONFIG_TXT="_includes/sources.txt"
-          CONFIG_YML="_includes/sources.yml"
 
           urls=()
 
@@ -44,17 +43,6 @@ jobs:
               [[ -z "$line" || "$line" =~ ^# ]] && continue
               urls+=("$line")
             done < "$CONFIG_TXT"
-          fi
-
-          # Load from YAML file: simple list with "- <url>" items; ignore comments/blank lines
-          if [[ -f "$CONFIG_YML" ]]; then
-            while IFS= read -r item; do
-              # Remove leading dash and whitespace, strip inline comments
-              item=$(sed -E 's/^\s*-\s*//' <<< "$item")
-              item=$(sed -E 's/\s+#.*$//' <<< "$item")
-              [[ -z "$item" ]] && continue
-              urls+=("$item")
-            done < <(grep -E '^[[:space:]]*-[[:space:]]*[^#[:space:]]' "$CONFIG_YML")
           fi
 
           if [[ ${#urls[@]} -eq 0 ]]; then
