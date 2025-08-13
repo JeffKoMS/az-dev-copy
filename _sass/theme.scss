@@ -343,3 +343,33 @@ main .table-striped>tbody>tr:nth-of-type(odd) {
 main.extra-padding {
     padding-bottom: 200px;
 }
+
+/* Alerts: client-side converted from GitHub-style > [!NOTE] syntax */
+.alert {
+    border-left-width: 4px;
+    border-left-style: solid;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-top: 15px;
+    background-color: #f8f9fa;
+}
+.alert .alert-title {
+    font-family: segoe-ui_semibold, "Segoe UI Semibold", "Segoe WP", "Helvetica Neue", Helvetica, sans-serif;
+    margin: 0 0 6px 0;
+}
+.alert-note { border-left-color: #0ea5e9; background-color: #ecfeff; }
+.alert-tip { border-left-color: #22c55e; background-color: #ecfdf5; }
+.alert-important { border-left-color: #6366f1; background-color: #eef2ff; }
+.alert-warning { border-left-color: #f59e0b; background-color: #fffbeb; }
+.alert-caution { border-left-color: #ef4444; background-color: #fef2f2; }
+
+.alert-note .alert-title::before { content: "Note"; }
+.alert-tip .alert-title::before { content: "Tip"; }
+.alert-important .alert-title::before { content: "Important"; }
+.alert-warning .alert-title::before { content: "Warning"; }
+.alert-caution .alert-title::before { content: "Caution"; }
+
+.alert .alert-title::before {
+    display: inline-block;
+    margin-right: .5ch;
+}
