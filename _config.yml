@@ -15,8 +15,8 @@ plugins:
   - jekyll-asciidoc
 markdown: GFM
 
-#asciidoctor:
-#  attributes:
-#    - source-highlighter=rouge
-#    - icons=font
-#    - sectanchors
+asciidoctor:
+  attributes:
+    - source-highlighter=rouge
+    - icons=font
+    - sectanchors
