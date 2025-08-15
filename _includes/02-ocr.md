@@ -158,7 +158,7 @@ In this exercise, you'll complete a partially implemented client application tha
 
 1. The program reads the text in the specified image file (*images/Lincoln.jpg*), which looks like this:
 
-    ![Photograph of a statue of Abraham Lincoln.](../media/Lincoln.jpg)
+    ![Photograph of a statue of Abraham Lincoln.](https://raw.githubusercontent.com/MicrosoftLearning/mslearn-ai-vision/refs/heads/main/Instructions/media/Lincoln.jpg)
 
 1. In the **read-text** folder, a **lines.jpg** image has been created. Use the (Azure cloud shell-specific) **download** command to download it:
 
@@ -168,11 +168,11 @@ In this exercise, you'll complete a partially implemented client application tha
 
     The download command creates a popup link at the bottom right of your browser, which you can select to download and open the file. The image should look simlar to this:
 
-    ![An image with the text highlighted.](../media/text.jpg)
+    ![An image with the text highlighted.](https://raw.githubusercontent.com/MicrosoftLearning/mslearn-ai-vision/refs/heads/main/Instructions/media/text.jpg)
 
 1. Run the program again, this time specifying the parameter *images/Business-card.jpg* to extract text from the following image:
 
-    ![Image of a scanned buisness card.](../media/Business-card.jpg)
+    ![Image of a scanned buisness card.](https://raw.githubusercontent.com/MicrosoftLearning/mslearn-ai-vision/refs/heads/main/Instructions/media/Business-card.jpg)
 
     ```
    python read-text.py images/Business-card.jpg
@@ -186,7 +186,7 @@ In this exercise, you'll complete a partially implemented client application tha
 
 1. Run the program one more time, this time specifying the parameter *images/Note.jpg* to extract text from this image:
 
-    ![Photograph of a handwritten shopping list.](../media/Note.jpg)
+    ![Photograph of a handwritten shopping list.](https://raw.githubusercontent.com/MicrosoftLearning/mslearn-ai-vision/refs/heads/main/Instructions/media/Note.jpg)
 
     ```
    python read-text.py images/Note.jpg
