@@ -1,12 +1,12 @@
 ---
 lab:
     topic: Azure API Management
-    title: 'AI vision lab testing include from external source'
+    title: 'OCR lab testing include from external source'
     description: 'Hoping.'
 ---
 
 <!-- This labs is maintained in the https://github.com/MicrosoftLearning/mslearn-ai-vision repository. Please file issues in that repository. -->
 
-{% include 01-analyze-images.md %}
+{% include 02-ocr.md %}
 
 
