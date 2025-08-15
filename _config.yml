@@ -12,11 +12,4 @@ plugins:
   - jekyll-sitemap
   - jekyll-mentions
   - jemoji
-  - jekyll-asciidoc
 markdown: GFM
-
-asciidoctor:
-  attributes:
-    - source-highlighter=rouge
-    - icons=font
-    - sectanchors
