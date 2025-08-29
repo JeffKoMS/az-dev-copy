@@ -19,18 +19,21 @@ Some exercises may have additional, or different, requirements. Those will conta
 
 {% assign total = grouped_exercises.size %}
 {% assign half = total | divided_by: 2 %}
-{% if total modulo 2 != 0 %}
+{% if total | modulo: 2 != 0 %}
 	{% assign half = half | plus: 1 %}
 {% endif %}
 
+{% assign first_col = grouped_exercises | slice: 0, half %}
+{% assign second_col = grouped_exercises | slice: half, total %}
+
 <div style="display: flex; gap: 2em;">
 	<ul style="flex: 1;">
-		{% for group in grouped_exercises limit: half %}
+		{% for group in first_col %}
 			<li><a href="#{{ group.name | slugify }}">{{ group.name }}</a></li>
 		{% endfor %}
 	</ul>
 	<ul style="flex: 1;">
-		{% for group in grouped_exercises offset: half %}
+		{% for group in second_col %}
 			<li><a href="#{{ group.name | slugify }}">{{ group.name }}</a></li>
 		{% endfor %}
 	</ul>
