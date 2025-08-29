@@ -16,11 +16,25 @@ Some exercises may have additional, or different, requirements. Those will conta
 {% assign exercises = site.pages | where_exp:"page", "page.url contains '/instructions'" %}
 {% assign grouped_exercises = exercises | group_by: "lab.topic" %}
 
-<ul>
-{% for group in grouped_exercises %}
-<li><a href="#{{ group.name | slugify }}">{{ group.name }}</a></li>
-{% endfor %}
-</ul>
+
+{% assign total = grouped_exercises.size %}
+{% assign half = total | divided_by: 2 %}
+{% if total modulo 2 != 0 %}
+	{% assign half = half | plus: 1 %}
+{% endif %}
+
+<div style="display: flex; gap: 2em;">
+	<ul style="flex: 1;">
+		{% for group in grouped_exercises limit: half %}
+			<li><a href="#{{ group.name | slugify }}">{{ group.name }}</a></li>
+		{% endfor %}
+	</ul>
+	<ul style="flex: 1;">
+		{% for group in grouped_exercises offset: half %}
+			<li><a href="#{{ group.name | slugify }}">{{ group.name }}</a></li>
+		{% endfor %}
+	</ul>
+</div>
 
 {% for group in grouped_exercises %}
 
