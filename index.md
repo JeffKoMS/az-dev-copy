@@ -4,6 +4,8 @@ permalink: index.html
 layout: home
 ---
 
+<link rel="stylesheet" href="/assets/topic-columns.css">
+
 ## Overview
 
 The following exercises are designed to provide you with a hands-on learning experience in which you'll explore common tasks that developers perform when building and deploying solutions to Microsoft Azure.
@@ -26,13 +28,13 @@ Some exercises may have additional, or different, requirements. Those will conta
 {% assign first_col = grouped_exercises | slice: 0, half %}
 {% assign second_col = grouped_exercises | slice: half, total %}
 
-<div style="display: flex; gap: 2em;">
-	<ul style="flex: 1;">
+<div class="topic-columns">
+	<ul>
 		{% for group in first_col %}
 			<li><a href="#{{ group.name | slugify }}">{{ group.name }}</a></li>
 		{% endfor %}
 	</ul>
-	<ul style="flex: 1;">
+	<ul>
 		{% for group in second_col %}
 			<li><a href="#{{ group.name | slugify }}">{{ group.name }}</a></li>
 		{% endfor %}

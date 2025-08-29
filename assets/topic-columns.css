@@ -1,0 +1,13 @@
+.topic-columns {
+  display: flex;
+  gap: 2em;
+}
+.topic-columns ul {
+  flex: 1;
+  list-style: disc inside;
+  margin: 0 0.5em;
+  padding: 0;
+}
+.topic-columns li {
+  margin-bottom: 0.5em;
+}
