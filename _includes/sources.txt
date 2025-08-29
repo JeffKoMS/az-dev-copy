@@ -2,3 +2,4 @@
 # IMPORTANT: Enter the raw links to the markdown, will not work otherwise
 https://raw.githubusercontent.com/MicrosoftLearning/mslearn-ai-vision/refs/heads/main/Instructions/Labs/01-analyze-images.md
 https://raw.githubusercontent.com/MicrosoftLearning/mslearn-ai-vision/refs/heads/main/Instructions/Labs/02-ocr.md
+https://raw.githubusercontent.com/MicrosoftLearning/dp-420-cosmos-db-dev/refs/heads/main/instructions/12-sdk-indexing-policy-custom.md
