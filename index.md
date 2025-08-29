@@ -4,7 +4,7 @@ permalink: index.html
 layout: home
 ---
 
-<link rel="stylesheet" href="/assets/topic-columns.css">
+<!--<link rel="stylesheet" href="/assets/topic-columns.css">-->
 
 ## Overview
 
@@ -28,7 +28,7 @@ Some exercises may have additional, or different, requirements. Those will conta
 {% assign first_col = grouped_exercises | slice: 0, half %}
 {% assign second_col = grouped_exercises | slice: half, total %}
 
-| Topic | Topic |
+| Topic |  |
 |---|---|
 {% for group in first_col %}
 | [{{ group.name }}](#{{ group.name | slugify }}) | {% if second_col[forloop.index0] %}[{{ second_col[forloop.index0].name }}](#{{ second_col[forloop.index0].name | slugify }}){% else %} {% endif %} |
