@@ -18,21 +18,11 @@ Some exercises may have additional, or different, requirements. Those will conta
 {% assign exercises = site.pages | where_exp:"page", "page.url contains '/instructions'" %}
 {% assign grouped_exercises = exercises | group_by: "lab.topic" %}
 
-
-{% assign total = grouped_exercises.size %}
-{% assign half = total | divided_by: 2 %}
-{% if total | modulo: 2 != 0 %}
-	{% assign half = half | plus: 1 %}
-{% endif %}
-
-{% assign first_col = grouped_exercises | slice: 0, half %}
-{% assign second_col = grouped_exercises | slice: half, total %}
-
-| Topic |  |
-|---|---|
-{% for group in first_col %}
-| [{{ group.name }}](#{{ group.name | slugify }}) | {% if second_col[forloop.index0] %}[{{ second_col[forloop.index0].name }}](#{{ second_col[forloop.index0].name | slugify }}){% else %} {% endif %} |
+<ul>
+{% for group in grouped_exercises %}
+<li><a href="#{{ group.name | slugify }}">{{ group.name }}</a></li>
 {% endfor %}
+</ul>
 
 {% for group in grouped_exercises %}
 
@@ -46,4 +36,3 @@ Some exercises may have additional, or different, requirements. Those will conta
 {% endfor %}
 <a href="#overview">Return to top</a>
 {% endfor %}
-
