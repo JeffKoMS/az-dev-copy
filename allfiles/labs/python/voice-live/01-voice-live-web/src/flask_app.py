@@ -193,8 +193,6 @@ def _validate_env() -> Tuple[bool, str]:
     
     return True, "Configuration valid"
 
-
-
 class BasicVoiceAssistant:
     """Minimal assistant implementation for VoiceLive API.
     
@@ -202,38 +200,12 @@ class BasicVoiceAssistant:
     Manages connection, session configuration, and event processing.
     """
 
-    # Initialize VoiceLive assistant with Azure service configuration.
-    def __init__(
-        self,
-        endpoint: str,
-        credential,
-        model: str,
-        voice: str,
-        instructions: str,
-        state_callback=None,
-    ):
-        self.endpoint = endpoint
-        self.credential = credential
-        self.model = model
-        self.voice = voice
-        self.instructions = instructions
-        self.connection = None
-        self._response_cancelled = False # When True, server will suppress broadcasting response events
-        self._stopping = False
-        self.state_callback = state_callback or (lambda *_: None)
+    # BEGIN VOICELIVE ASSISTANT IMPLEMENTATION - ALIGN CODE WITH COMMENT
 
-    async def start(self):
-        # Import VoiceLive SDK components for async connection and models
-        from azure.ai.voicelive.aio import connect  # type: ignore
-        from azure.ai.voicelive.models import (
-            RequestSession,
-            ServerVad,
-            AzureStandardVoice,
-            Modality,
-            InputAudioFormat,
-            OutputAudioFormat,
-        )  # type: ignore
-        
+
+    
+    # END VOICELIVE ASSISTANT IMPLEMENTATION
+
         verbose_val = __import__('os').environ.get('VOICE_LIVE_VERBOSE', '0').strip()
         verbose = bool(int(verbose_val)) if verbose_val.isdigit() else False
         try:
@@ -255,16 +227,10 @@ class BasicVoiceAssistant:
                 else:
                     voice_cfg = self.voice
 
-                # Configure VoiceLive session with audio/text modalities and voice activity detection
-                session_config = RequestSession(
-                    modalities=[Modality.TEXT, Modality.AUDIO],
-                    instructions=self.instructions,
-                    voice=voice_cfg,
-                    input_audio_format=InputAudioFormat.PCM16,
-                    output_audio_format=OutputAudioFormat.PCM16,
-                    turn_detection=ServerVad(threshold=0.5, prefix_padding_ms=300, silence_duration_ms=500),
-                )
-                await conn.session.update(session=session_config)
+                # BEGIN CONFIGURE VOICELIVE SESSION - ALIGN CODE WITH COMMENT
+
+
+                # END CONFIGURE VOICELIVE SESSION
 
                 # Main event processing loop - handle all VoiceLive server events
                 async for event in conn:
@@ -316,35 +282,11 @@ class BasicVoiceAssistant:
         elif event_type == ServerEventType.ERROR:
             await self._handle_error(event)
 
-    async def _handle_session_updated(self):
-        """Session is ready for conversation."""
-        self.state_callback("ready", "Session ready. You can start speaking now.")
+    # BEGIN HANDLE SESSION EVENTS - ALIGN CODE WITH COMMENT
+    
 
-    async def _handle_speech_started(self, conn):
-        """User started speaking - handle interruption if needed."""
-        self.state_callback("listening", "Listening… speak now")
-        
-        try:
-            # Always stop client audio playback when user speaks
-            _broadcast({"type": "control", "action": "stop_playback"})
-            
-            # Cancel VoiceLive response if assistant is actively responding (enables interruption)
-            current_state = assistant_state.get("state")
-            if current_state in {"assistant_speaking", "processing"}:
-                self._response_cancelled = True
-                await conn.response.cancel()
-                _broadcast({"type": "log", "level": "debug", 
-                          "msg": f"Interrupted assistant during {current_state}"})
-            else:
-                _broadcast({"type": "log", "level": "debug", 
-                          "msg": f"User speaking during {current_state} - no cancellation needed"})
-        except Exception as e:
-            _broadcast({"type": "log", "level": "debug", 
-                      "msg": f"Exception in speech handler: {e}"})
 
-    async def _handle_speech_stopped(self):
-        """User stopped speaking - processing input."""
-        self.state_callback("processing", "Processing your input…")
+    # END HANDLE SESSION EVENTS
 
     async def _handle_audio_delta(self, event):
         """Stream assistant audio to clients."""
