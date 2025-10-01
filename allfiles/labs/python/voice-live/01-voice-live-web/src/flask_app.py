@@ -285,7 +285,6 @@ class BasicVoiceAssistant:
     # BEGIN HANDLE SESSION EVENTS - ALIGN CODE WITH COMMENT
     
 
-
     # END HANDLE SESSION EVENTS
 
     async def _handle_audio_delta(self, event):
