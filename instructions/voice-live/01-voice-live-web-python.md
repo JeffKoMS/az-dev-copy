@@ -17,7 +17,7 @@ Tasks performed in this exercise:
 * Update and run the deployment script
 * View and test the application
 
-This exercise takes approximately **30-40** minutes to complete.
+This exercise takes approximately **20-30** minutes to complete.
 
 ## Before you start
 
