@@ -239,7 +239,7 @@ When the deployment completes a "Deployment complete!" message will be in the sh
 Troubleshooting:
 
 * If the app reports missing environment variables, restart the application in App Service.
-* If you see excessive messages in the log shown in the application select **Stop session** and then start the session again. 
+* If you see excessive *audio chunk* messages in the log shown in the application select **Stop session** and then start the session again. 
 * If the app fails to function at all, double-check you added all of the code and for proper indentation. If you need to make any changes re-run the deployment and select **option 2** to only update the image.
 
 
