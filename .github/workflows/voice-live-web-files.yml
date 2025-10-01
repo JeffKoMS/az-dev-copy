@@ -1,0 +1,30 @@
+name: Zip Voice Live Web Files
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'allfiles/labs/python/voice-live/**'
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  create_zip:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Create Voice Live zip
+      run: | 
+        cd ./allfiles/labs/python/voice-live
+        zip -r -q ../../../downloads/python/voice-live-web.zip *
+    - name: Commit and push
+      uses: Endbug/add-and-commit@v7
+      with:
+        add: 'allfiles/downloads/python/voice-live-web.zip'
+        message: 'Updating Zip for python source files'
+        push: true
+
