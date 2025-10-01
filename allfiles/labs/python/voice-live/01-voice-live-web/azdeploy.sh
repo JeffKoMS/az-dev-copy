@@ -165,8 +165,11 @@ azd env set AZURE_RESOURCE_GROUP $rg >/dev/null
 echo "  - AZD environment '$azd_env_name' created (fresh state)"
 
 echo "  - Provisioning AI resources (forcing new deployment)..."
-# Ensure azd is authenticated (use existing Azure CLI auth)
-azd auth login 2>/dev/null || true
+# Verify azd authentication (inherits from Azure CLI in Cloud Shell)
+if ! azd auth login --check-status >/dev/null 2>&1; then
+    echo "  - Authenticating azd with Azure..."
+    azd auth login 2>/dev/null || true
+fi
 
 # Force a completely fresh deployment by combining multiple techniques
 azd config set alpha.infrastructure.deployment.name "azd-gpt-realtime-$(date +%s)"
@@ -339,4 +342,6 @@ echo " - Flask app deployed to App Service: READY"
 echo " - Your app is available at: https://${webapp_name}.azurewebsites.net"
 echo
 echo "Note: App may take a few minutes to start after loading the web page."
+echo
+echo "To update the container with new code changes, run this script again and select option 2 (Container update only)."
 echo
