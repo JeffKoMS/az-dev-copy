@@ -7,6 +7,9 @@ on:
     paths:
       - 'allfiles/labs/dotnet/azure-storage/**'
 
+permissions:
+  contents: write
+
 defaults:
   run:
     shell: pwsh
