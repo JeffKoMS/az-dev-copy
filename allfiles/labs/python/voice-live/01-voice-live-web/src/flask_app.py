@@ -194,23 +194,23 @@ def _validate_env() -> Tuple[bool, str]:
     return True, "Configuration valid"
 
 class BasicVoiceAssistant:
-    """Minimal assistant implementation for VoiceLive API.
+    """Minimal assistant implementation for Voice Live API.
     
-    Handles real-time voice conversation using Azure's VoiceLive service.
+    Handles real-time voice conversation using Azure's Voice Live service.
     Manages connection, session configuration, and event processing.
     """
 
-    # BEGIN VOICELIVE ASSISTANT IMPLEMENTATION - ALIGN CODE WITH COMMENT
+    # BEGIN VOICE LIVE ASSISTANT IMPLEMENTATION - ALIGN CODE WITH COMMENT
 
 
     
-    # END VOICELIVE ASSISTANT IMPLEMENTATION
+    # END VOICE LIVE ASSISTANT IMPLEMENTATION
 
         verbose_val = __import__('os').environ.get('VOICE_LIVE_VERBOSE', '0').strip()
         verbose = bool(int(verbose_val)) if verbose_val.isdigit() else False
         try:
-            _broadcast({"type": "log", "level": "info", "msg": f"Connecting to VoiceLive endpoint={self.endpoint} model={self.model} voice={self.voice}"})
-            # Establish async connection to Azure VoiceLive service with optimized settings
+            _broadcast({"type": "log", "level": "info", "msg": f"Connecting to Voice Live endpoint={self.endpoint} model={self.model} voice={self.voice}"})
+            # Establish async connection to Azure Voice Live service with optimized settings
             async with connect(
                 endpoint=self.endpoint,
                 credential=self.credential,
@@ -227,12 +227,13 @@ class BasicVoiceAssistant:
                 else:
                     voice_cfg = self.voice
 
-                # BEGIN CONFIGURE VOICELIVE SESSION - ALIGN CODE WITH COMMENT
+                # BEGIN CONFIGURE VOICE LIVE SESSION - ALIGN CODE WITH COMMENT
 
 
-                # END CONFIGURE VOICELIVE SESSION
 
-                # Main event processing loop - handle all VoiceLive server events
+                # END CONFIGURE VOICE LIVE SESSION
+
+                # Main event processing loop - handle all Voice Live server events
                 async for event in conn:
                     if self._stopping:
                         break
@@ -248,7 +249,7 @@ class BasicVoiceAssistant:
         self.connection = None
 
     async def append_audio(self, audio_b64: str):
-        """Send base64-encoded audio data to VoiceLive input buffer."""
+        """Send base64-encoded audio data to Voice Live input buffer."""
         if not self.connection:
             return
         try:
@@ -256,66 +257,11 @@ class BasicVoiceAssistant:
         except Exception as e:  # pragma: no cover
             logger.error("Failed to append audio: %s", e)
 
-    async def _handle_event(self, event, conn, verbose=False):
-        """Handle VoiceLive events with clear separation by event type."""
-        # Import event types for processing different VoiceLive server events
-        from azure.ai.voicelive.models import ServerEventType
-        
-        event_type = event.type
-        if verbose:
-            _broadcast({"type": "log", "level": "debug", "event_type": str(event_type)})
-        
-        # Route VoiceLive server events to appropriate handlers
-        if event_type == ServerEventType.SESSION_UPDATED:
-            await self._handle_session_updated()
-        elif event_type == ServerEventType.INPUT_AUDIO_BUFFER_SPEECH_STARTED:
-            await self._handle_speech_started(conn)
-        elif event_type == ServerEventType.INPUT_AUDIO_BUFFER_SPEECH_STOPPED:
-            await self._handle_speech_stopped()
-        elif event_type == ServerEventType.RESPONSE_AUDIO_DELTA:
-            await self._handle_audio_delta(event)
-        elif event_type == ServerEventType.RESPONSE_AUDIO_DONE:
-            await self._handle_audio_done()
-        elif event_type == ServerEventType.RESPONSE_DONE:
-            # Reset cancellation flag but don't change state - _handle_audio_done already did
-            self._response_cancelled = False
-        elif event_type == ServerEventType.ERROR:
-            await self._handle_error(event)
-
     # BEGIN HANDLE SESSION EVENTS - ALIGN CODE WITH COMMENT
-    
+
+
 
     # END HANDLE SESSION EVENTS
-
-    async def _handle_audio_delta(self, event):
-        """Stream assistant audio to clients."""
-        if self._response_cancelled:
-            return  # Skip cancelled responses
-            
-        # Update state when assistant starts speaking
-        if assistant_state.get("state") != "assistant_speaking":
-            self.state_callback("assistant_speaking", "Assistant speaking…")
-        
-        # Extract and broadcast VoiceLive audio delta as base64 to WebSocket clients
-        audio_data = getattr(event, "delta", None)
-        if audio_data:
-            audio_b64 = base64.b64encode(audio_data).decode("utf-8")
-            _broadcast({"type": "audio", "audio": audio_b64})
-
-    async def _handle_audio_done(self):
-        """Assistant finished speaking."""
-        self._response_cancelled = False
-        self.state_callback("ready", "Assistant finished. You can speak again.")
-
-    async def _handle_error(self, event):
-        """Handle VoiceLive errors."""
-        error = getattr(event, "error", None)
-        message = getattr(error, "message", "Unknown error") if error else "Unknown error"
-        self.state_callback("error", f"Error: {message}")
-
-    def request_stop(self):
-        self._stopping = True
-
 
 def _run_assistant_bg():
     """Background thread target to run the async assistant until completion."""
@@ -346,7 +292,7 @@ def _run_assistant_bg():
             set_state("error", "Missing AZURE_VOICE_LIVE_API_KEY environment variable")
             return
         credential = AzureKeyCredential(api_key)
-        logger.info("Using API key authentication for VoiceLive (AZURE_VOICE_LIVE_API_KEY)")
+        logger.info("Using API key authentication for Voice Live (AZURE_VOICE_LIVE_API_KEY)")
 
         def cb(state, message):
             set_state(state, message)
