@@ -1,13 +1,17 @@
 ---
 lab:
     topic: Azure Voice Live
-    title: 'Create a web app for real-time voice interaction with an AI model'
-    description: 'Learn how to create a Flask-based web app to enable real-time voice interactions with an AI model.'
+    title: 'Develop an Azure AI Voice Live voice agent'
+    description: 'Learn how to create a web app to enable real-time voice interactions with an Azure AI Voice Live agent.'
 ---
 
-# Create a web app for real-time voice interaction with an AI model
+# Develop an Azure AI Voice Live voice agent
 
-In this exercise, you complete a Python web app based on Flask. You add the code to initialize the session, and handle key session events. You use a deployment script that: deploys the AI model; creates an image of the app in Azure Container Registry (ACR) using ACR tasks; and then creates an Azure App Service instance that pulls the the image. 
+In this exercise, you complete a Flask-based Python web app based that enables real-time voice interactions with an agent. You add the code to initialize the session, and handle session events. You use a deployment script that: deploys the AI model; creates an image of the app in Azure Container Registry (ACR) using ACR tasks; and then creates an Azure App Service instance that pulls the the image. To test the app you will need an audio device with microphone and speaker capabilities.
+
+While this exercise is based on Python, you can develop similar applications other language-specific SDKs; including:
+
+- [Azure VoiceLive client library for .NET](https://www.nuget.org/packages/Azure.AI.VoiceLive/)
 
 Tasks performed in this exercise:
 
@@ -17,14 +21,7 @@ Tasks performed in this exercise:
 * Update and run the deployment script
 * View and test the application
 
-This exercise takes approximately **20-30** minutes to complete.
-
-## Before you start
-
-To complete the exercise, you need:
-
-* An Azure subscription with appropriate permissions to deploy the needed Azure resources. If you don't already have one, you can [sign up for one](https://azure.microsoft.com/).
-* An audio device with microphone and speaker capabilities.
+This exercise takes approximately **30** minutes to complete.
 
 ## Launch the Azure Cloud Shell and download the files
 
@@ -70,7 +67,7 @@ In this section you add code to implement the voice live assistant. The **\_\_in
     code flask_app.py
     ```
 
-1. Search for the **# BEGIN VOICELIVE ASSISTANT IMPLEMENTATION** comment in the code. Copy the code below and enter it just below the comment. Be sure to check the indentation.
+1. Search for the **# BEGIN VOICE LIVE ASSISTANT IMPLEMENTATION - ALIGN CODE WITH COMMENT** comment in the code. Copy the code below and enter it just below the comment. Be sure to check the indentation.
 
     ```python
     def __init__(
@@ -82,7 +79,7 @@ In this section you add code to implement the voice live assistant. The **\_\_in
         instructions: str,
         state_callback=None,
     ):
-        # Store Azure VoiceLive connection and configuration parameters
+        # Store Azure Voice Live connection and configuration parameters
         self.endpoint = endpoint
         self.credential = credential
         self.model = model
@@ -94,9 +91,9 @@ In this section you add code to implement the voice live assistant. The **\_\_in
         self._response_cancelled = False  # Used to handle user interruptions
         self._stopping = False  # Signals graceful shutdown
         self.state_callback = state_callback or (lambda *_: None)
-    
+
     async def start(self):
-        # Import VoiceLive SDK components needed for establishing connection and configuring session
+        # Import Voice Live SDK components needed for establishing connection and configuring session
         from azure.ai.voicelive.aio import connect  # type: ignore
         from azure.ai.voicelive.models import (
             RequestSession,
@@ -114,7 +111,7 @@ In this section you add code to implement the voice live assistant. The **\_\_in
 
 In this section you add code to configure the voice live session. This specifies the modalities (audio-only is not supported by the API), the system instructions that define the assistant's behavior, the Azure TTS voice for responses, the audio format for both input and output streams, and Server-side Voice Activity Detection (VAD) which specifies how the model detects when users start and stop speaking.
 
-1. Search for the **# BEGIN CONFIGURE VOICELIVE SESSION** comment in the code. Copy the code below and enter it just below the comment. Be sure to check the indentation.
+1. Search for the **# BEGIN CONFIGURE VOICE LIVE SESSION - ALIGN CODE WITH COMMENT** comment in the code. Copy the code below and enter it just below the comment. Be sure to check the indentation.
 
     ```python
     # Configure VoiceLive session with audio/text modalities and voice activity detection
@@ -135,15 +132,39 @@ In this section you add code to configure the voice live session. This specifies
 
 In this section you add code to add event handlers for the voice live session. The event handlers respond to key VoiceLive session events during the conversation lifecycle: **_handle_session_updated** signals when the session is ready for user input, **_handle_speech_started** detects when the user begins speaking and implements interruption logic by stopping any ongoing assistant audio playback and canceling in-progress responses to allow natural conversation flow, and **_handle_speech_stopped** handles when the user has finished speaking and the assistant begins processing the input.
 
->**Note:** that this section implments only a subset of the event handlers in the app. Additional handlers manage audio streaming, completion events, and error conditions.
-
-1. Search for the **# BEGIN HANDLE SESSION EVENTS** comment in the code. Copy the code below and enter it just below the comment. Be sure to check the indentation.
+1. Search for the **# BEGIN HANDLE SESSION EVENTS - ALIGN CODE WITH COMMENT** comment in the code. Copy the code below and enter it just below the comment, be sure to check the indentation.
 
     ```python
+    async def _handle_event(self, event, conn, verbose=False):
+        """Handle Voice Live events with clear separation by event type."""
+        # Import event types for processing different Voice Live server events
+        from azure.ai.voicelive.models import ServerEventType
+        
+        event_type = event.type
+        if verbose:
+            _broadcast({"type": "log", "level": "debug", "event_type": str(event_type)})
+        
+        # Route Voice Live server events to appropriate handlers
+        if event_type == ServerEventType.SESSION_UPDATED:
+            await self._handle_session_updated()
+        elif event_type == ServerEventType.INPUT_AUDIO_BUFFER_SPEECH_STARTED:
+            await self._handle_speech_started(conn)
+        elif event_type == ServerEventType.INPUT_AUDIO_BUFFER_SPEECH_STOPPED:
+            await self._handle_speech_stopped()
+        elif event_type == ServerEventType.RESPONSE_AUDIO_DELTA:
+            await self._handle_audio_delta(event)
+        elif event_type == ServerEventType.RESPONSE_AUDIO_DONE:
+            await self._handle_audio_done()
+        elif event_type == ServerEventType.RESPONSE_DONE:
+            # Reset cancellation flag but don't change state - _handle_audio_done already did
+            self._response_cancelled = False
+        elif event_type == ServerEventType.ERROR:
+            await self._handle_error(event)
+
     async def _handle_session_updated(self):
         """Session is ready for conversation."""
         self.state_callback("ready", "Session ready. You can start speaking now.")
-    
+
     async def _handle_speech_started(self, conn):
         """User started speaking - handle interruption if needed."""
         self.state_callback("listening", "Listening… speak now")
@@ -158,24 +179,53 @@ In this section you add code to add event handlers for the voice live session. T
                 self._response_cancelled = True
                 await conn.response.cancel()
                 _broadcast({"type": "log", "level": "debug", 
-                            "msg": f"Interrupted assistant during {current_state}"})
+                          "msg": f"Interrupted assistant during {current_state}"})
             else:
                 _broadcast({"type": "log", "level": "debug", 
-                            "msg": f"User speaking during {current_state} - no cancellation needed"})
+                          "msg": f"User speaking during {current_state} - no cancellation needed"})
         except Exception as e:
             _broadcast({"type": "log", "level": "debug", 
-                        "msg": f"Exception in speech handler: {e}"})
-    
+                      "msg": f"Exception in speech handler: {e}"})
+
     async def _handle_speech_stopped(self):
         """User stopped speaking - processing input."""
         self.state_callback("processing", "Processing your input…")
+
+    async def _handle_audio_delta(self, event):
+        """Stream assistant audio to clients."""
+        if self._response_cancelled:
+            return  # Skip cancelled responses
+            
+        # Update state when assistant starts speaking
+        if assistant_state.get("state") != "assistant_speaking":
+            self.state_callback("assistant_speaking", "Assistant speaking…")
+        
+        # Extract and broadcast Voice Live audio delta as base64 to WebSocket clients
+        audio_data = getattr(event, "delta", None)
+        if audio_data:
+            audio_b64 = base64.b64encode(audio_data).decode("utf-8")
+            _broadcast({"type": "audio", "audio": audio_b64})
+
+    async def _handle_audio_done(self):
+        """Assistant finished speaking."""
+        self._response_cancelled = False
+        self.state_callback("ready", "Assistant finished. You can speak again.")
+
+    async def _handle_error(self, event):
+        """Handle Voice Live errors."""
+        error = getattr(event, "error", None)
+        message = getattr(error, "message", "Unknown error") if error else "Unknown error"
+        self.state_callback("error", f"Error: {message}")
+
+    def request_stop(self):
+        self._stopping = True
     ```
 
 1. Enter **ctrl+s** to save your changes and keep the editor open for the next section.
 
 ### Review the code in the app
 
-There is a lot of code in the **flask_app.py** app. Take a few minutes to review the full code and comments to get a better understanding of what the app is doing.
+So far, you've added code to the app to implement the agent and handle agent events. Take a few minutes to review the full code and comments to get a better understanding of how the app is handling client state and operations.
 
 1. When you're finished enter **ctrl+q** to exit out of the editor. 
 
@@ -241,7 +291,6 @@ Troubleshooting:
 * If the app reports missing environment variables, restart the application in App Service.
 * If you see excessive *audio chunk* messages in the log shown in the application select **Stop session** and then start the session again. 
 * If the app fails to function at all, double-check you added all of the code and for proper indentation. If you need to make any changes re-run the deployment and select **option 2** to only update the image.
-
 
 ## Clean up resources
 
